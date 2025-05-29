@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เกม Microsoft Word</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(to right, #f0f8ff, #e0c3fc);
+      margin: 0;
+      padding: 0;
+    }
+    .game-container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+    }
+    .question-box {
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .choices {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .choice {
+      background: #fff;
+      padding: 1rem;
+      border: 2px dashed #ccc;
+      border-radius: 12px;
+      cursor: grab;
+    }
+    .dropzone {
+      background: #f8f8f8;
+      border: 3px dashed #aaa;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    .timer-bar {
+      height: 20px;
+      background: green;
+      width: 100%;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      transition: width 1s linear;
+    }
+    .button-check {
+      background: #4CAF50;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .summary {
+      padding: 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="game">
+    <div class="timer-bar" id="timerBar"></div>
+    <div class="question-box" id="questionBox">กำลังโหลดคำถาม...</div>
+    <div class="choices" id="choices"></div>
+    <div class="dropzone" id="dropzone">วางคำตอบที่นี่</div>
+    <button class="button-check" onclick="checkAnswer()">ตรวจคำตอบ</button>
+  </div>
+
+  <div class="summary" id="summary" style="display:none">
+    <h2>สรุปผลการเล่น</h2>
+    <p><strong>ชื่อ:</strong> <span id="sName"></span></p>
+    <p><strong>ชั้น:</strong> <span id="sClass"></span></p>
+    <p><strong>เลขที่:</strong> <span id="sNumber"></span></p>
+    <p><strong>คะแนนรวม:</strong> <span id="totalScore"></span></p>
+    <div id="answersList"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const questions = [
+      {
+        question: 'นักเรียนเปิดโปรแกรม Word แล้วอยากเริ่มพิมพ์งานใหม่ นักเรียนควรทำอย่างไร?',
+        choices: ['คลิก "Open" หรือ "เปิดเอกสาร"', 'คลิก "New Document" หรือ "เอกสารเปล่า"', 'ปิดคอมพิวเตอร์'],
+        answer: 'คลิก "New Document" หรือ "เอกสารเปล่า"'
+      },
+      // เพิ่มคำถามอีก 9 ข้อต่อจากนี้ตามโครงสร้าง
+    ];
+
+    let current = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 30;
+
+    const studentName = localStorage.getItem('studentName');
+    const studentClass = localStorage.getItem('studentClass');
+    const studentNumber = localStorage.getItem('studentNumber');
+
+    function showQuestion() {
+      if (current >= questions.length) return showSummary();
+      const q = questions[current];
+      document.getElementById('questionBox').innerText = q.question;
+      const choices = q.choices.sort(() => Math.random() - 0.5);
+      const choicesEl = document.getElementById('choices');
+      choicesEl.innerHTML = '';
+      for (const c of choices) {
+        const div = document.createElement('div');
+        div.className = 'choice';
+        div.draggable = true;
+        div.textContent = c;
+        div.ondragstart = e => e.dataTransfer.setData('text/plain', c);
+        choicesEl.appendChild(div);
+      }
+      document.getElementById('dropzone').innerText = 'วางคำตอบที่นี่';
+      timeLeft = 30;
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      const bar = document.getElementById('timerBar');
+      timer = setInterval(() => {
+        timeLeft--;
+        bar.style.width = `${(timeLeft / 30) * 100}%`;
+        bar.style.background = timeLeft <= 10 ? 'red' : 'green';
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          checkAnswer(true);
+        }
+      }, 1000);
+    }
+
+    document.getElementById('dropzone').ondragover = e => e.preventDefault();
+    document.getElementById('dropzone').ondrop = e => {
+      e.preventDefault();
+      const data = e.dataTransfer.getData('text');
+      document.getElementById('dropzone').innerText = data;
+    };
+
+    function checkAnswer(timeout = false) {
+      clearInterval(timer);
+      const userAns = document.getElementById('dropzone').innerText;
+      const correct = questions[current].answer;
+      if (userAns === correct) {
+        let bonus = timeout ? 0 : timeLeft * 5;
+        score += 20 + bonus;
+        Swal.fire('ถูกต้อง!', `ได้ ${20 + bonus} คะแนน`, 'success');
+      } else {
+        Swal.fire('ผิด!', `คำตอบที่ถูกคือ: ${correct}`, 'error');
+      }
+      current++;
+      setTimeout(showQuestion, 2000);
+    }
+
+    function showSummary() {
+      document.getElementById('game').style.display = 'none';
+      document.getElementById('summary').style.display = 'block';
+      document.getElementById('sName').innerText = studentName;
+      document.getElementById('sClass').innerText = studentClass;
+      document.getElementById('sNumber').innerText = studentNumber;
+      document.getElementById('totalScore').innerText = score;
+      // เพิ่มการแสดงผลละเอียดเพิ่มเติมได้ที่นี่
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เริ่มต้นการใช้งานโปรแกรม Microsoft Word</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(to right, #add8e6, #dda0dd);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+    }
+    .logo {
+      max-width: 120px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-top: 0.5rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .start-btn {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .instructions {
+      background: #f0f8ff;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-left: 5px solid #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://drive.google.com/file/d/1I_Pj2u6vg5zsy_yBiOylzO7JFSnmarxv/view?usp=sharing">
+    <h1>เริ่มต้นการใช้งานโปรแกรม Microsoft Word</h1>
+  </header>
+
+  <div class="container">
+    <div class="instructions">
+      <h3>วิธีการเล่น</h3>
+      <p>ลากคำตอบที่ถูกต้องจากด้านซ้ายมาวางในช่องว่างด้านขวาให้ถูกต้องภายในเวลา 30 วินาทีต่อข้อ หากวางคำตอบครบแล้วให้กด "ตรวจคำตอบ"</p>
+      <ul>
+        <li>ตอบถูก ได้ 20 คะแนน + เวลาที่เหลือ x5 เป็นโบนัส</li>
+        <li>ตอบผิด ได้กำลังใจและสามารถลองใหม่ได้</li>
+      </ul>
+      <p>เมื่อจบเกมจะมีหน้าสรุปคะแนน พร้อมแสดงข้อมูล:</p>
+      <ul>
+        <li>ชื่อ-สกุล, ชั้น, เลขที่</li>
+        <li>จำนวนข้อที่ตอบถูก / ตอบบางส่วน / ตอบผิด</li>
+        <li>คะแนนรายข้อและคะแนนรวม</li>
+        <li>เวลาที่ใช้ทั้งหมด</li>
+        <li>เฉลยแบบละเอียดของแต่ละข้อ</li>
+      </ul>
+    </div>
+
+    <div class="form-group">
+      <label for="name">ชื่อ-สกุล</label>
+      <input type="text" id="name" placeholder="กรอกชื่อ-สกุล">
+    </div>
+    <div class="form-group">
+      <label for="class">ชั้น</label>
+      <input type="text" id="class" placeholder="กรอกชั้นเรียน เช่น ม.1/1">
+    </div>
+    <div class="form-group">
+      <label for="number">เลขที่</label>
+      <input type="number" id="number" placeholder="กรอกเลขที่">
+    </div>
+
+    <button class="start-btn" onclick="startGame()">
+      🎮 เริ่มเล่นเกม
+    </button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function startGame() {
+      const name = document.getElementById('name').value.trim();
+      const className = document.getElementById('class').value.trim();
+      const number = document.getElementById('number').value.trim();
+
+      if (!name || !className || !number) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'ข้อมูลไม่ครบ!',
+          text: 'กรุณากรอกชื่อ-สกุล, ชั้น และเลขที่ให้ครบถ้วน',
+          confirmButtonText: 'ตกลง'
+        });
+        return;
+      }
+
+      localStorage.setItem('studentName', name);
+      localStorage.setItem('studentClass', className);
+      localStorage.setItem('studentNumber', number);
+      window.location.href = 'game.html';
+    }
+  </script>
+</body>
+</html>
